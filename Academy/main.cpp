@@ -1,4 +1,4 @@
-#include <iostream>
+п»ї#include <iostream>
 using std::cin;
 using std::cout;
 using std::endl;
@@ -37,7 +37,7 @@ public:
 		this->age = age;
 	}
 
-	//					Constructorы:
+	//					ConstructorС‹:
 	Human(HUMAN_TAKE_PARAMETRS)
 	{
 		set_last_name(last_name);
@@ -64,8 +64,8 @@ class Student :public Human
 {
 	std::string speciality;
 	std::string group;
-	double rating;				//Успеваемость
-	double attendance;			//Посещаемость
+	double rating;				//РЈСЃРїРµРІР°РµРјРѕСЃС‚СЊ
+	double attendance;			//РџРѕСЃРµС‰Р°РµРјРѕСЃС‚СЊ
 public:
 	const std::string& get_speciality()const
 	{
