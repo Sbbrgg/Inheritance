@@ -208,7 +208,7 @@ public:
 
 //#define INHERITANCE
 //#define POLYMORPHISM
-
+#define READ_FROM_FILE
 
 void main()
 {
@@ -256,4 +256,74 @@ void main()
 	}
 #endif // POLYMORPHISM
 
+	std::ifstream fin("group.csv");
+	const int size = 15;
+	int count_el = 0;
+	Human* group[size] = {};
+
+	if (fin.is_open())
+	{
+		while (!fin.eof() && count_el < count_el)
+		{
+			const int T_size = 16;
+			const int B_size = 256;
+			char* tokens[T_size] = {};
+			int count_token = 0;
+			char buffer[B_size] = {};
+			char* context = nullptr;
+			fin.getline(buffer, B_size);
+			if (strlen(buffer) == 0) continue;	//пропуск пустой строки
+
+			char* ps = strtok_s(buffer, " ", &context);
+			while (ps != nullptr && count_token < T_size)
+			{
+				tokens[count_token++] = ps;
+				ps = strtok_s(nullptr, ", ", &context);
+			}
+			switch (count_token)
+			{
+			case 3: // Human
+				group[count_el++] = new Human(tokens[0], tokens[1], atoi(tokens[2]));
+				break;
+			case 5: // Teacher
+				group[count_el++] = new Teacher(tokens[0], tokens[1], atoi(tokens[2]),
+					tokens[3], atoi(tokens[4]));
+				break;
+			case 7: // Student
+				group[count_el++] = new Student(tokens[0], tokens[1], atoi(tokens[2]),
+					tokens[3], tokens[4],
+					atof(tokens[5]), atof(tokens[6]));
+				break;
+			case 8: // Graduate (11 параметров в вашем коде, но в классе только 8)
+				group[count_el++] = new Graduate(tokens[0], tokens[1], atoi(tokens[2]),
+					tokens[3], tokens[4],
+					atof(tokens[5]), atof(tokens[6]),
+					tokens[7]);
+				break;
+			default:
+				std::cerr << "Unknown format in line: " << buffer << endl;
+				break;
+			}
+		}
+		fin.close();
+	}
+	else
+	{
+		std::cerr << "Error: file not found" << endl;
+		return;
+	}
+	for (int i = 0; i < count_el; i++)
+	{
+		if (group[i] != nullptr)
+		{
+			cout << *group[i] << endl;
+			cout << delimiter << endl;
+		}
+	}
+	for (int i = 0; i < count_el; i++)
+	{
+		delete group[i];
+		cout << "Deleted object #" << i << endl;
+	}
 }
+
