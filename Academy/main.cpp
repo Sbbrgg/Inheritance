@@ -55,15 +55,15 @@ public:
 	}
 
 	//					Methods:
-	virtual std::ostream& info(std::ostream& os)const	//Base class
+	virtual void info()const	//Base class
 	{
-		return os << last_name << " " << first_name << " " << age;
+		cout << last_name << " " << first_name << " " << age << endl;
 	}
 };
 
 std::ostream& operator<<(std::ostream& os, const Human& obj)
 {
-	return obj.info(os);
+	return os << obj.get_last_name() << " " << obj.get_first_name() << " " << obj.get_age();
 }
 
 #define STUDENT_TAKE_PARAMETERS const std::string& speciality, const std::string& group, double rating, double attendance
@@ -124,11 +124,17 @@ public:
 	}
 
 	//					Methods:
-	std::ostream& info(std::ostream& os)const override//Derived class
+	void info()const override//Derived class
 	{
-		return Human::info(os) << " " << speciality << " " << group << " " << rating << " " << attendance;
+		Human::info();
+		cout << speciality << " " << group << " " << rating << " " << attendance << endl;
 	}
 };
+std::ostream& operator<<(std::ostream& os, const Student& obj)
+{
+	os << (Human&)obj;	//Upcast
+	return os << obj.get_speciality() << " " << obj.get_group() << " " << obj.get_rating() << " " << obj.get_attendance();
+}
 
 #define TEACHER_TAKE_PARAMETERS const std::string& speciality, int experience
 #define TEACHER_GIVE_PARAMETERS speciality, experience
@@ -166,11 +172,16 @@ public:
 	{
 		cout << "TDestructor:\t" << this << endl;
 	}
-	std::ostream& info(std::ostream& os)const override
+	void info()const override
 	{
-		return Human::info(os) << " " << speciality << " " << experience;
+		Human::info();
+		cout << speciality << " " << experience << endl;
 	}
 };
+std::ostream& operator<<(std::ostream& os, const Teacher& obj)
+{
+	return os << (Human&)obj << " " << obj.get_speciality() << " " << obj.get_experience();
+}
 
 #define GRADUATE_TAKE_PARAMETERS const std::string& subject
 #define GRADUATE_GIVE_PARAMETERS subject
@@ -201,14 +212,20 @@ public:
 	}
 
 	//				Methods:
-	std::ostream& info(std::ostream& os)const override
+	void info()const override
 	{
-		return Student::info(os) << " " << get_subject();
+		Student::info();
+		cout << get_subject() << endl;
 	}
 };
 
+std::ostream& operator<<(std::ostream& os, const Graduate& obj)
+{
+	return os << (Student&)obj << " " << obj.get_subject();
+}
+
 //#define INHERITANCE
-#define POLYMORPHISM //(poly - много, morphis - форма)
+#define Polymorphism //(poly - много, morphis - форма)
 
 void main()
 {
@@ -228,8 +245,6 @@ void main()
 	graduate.info();
 #endif // INHERITANCE
 
-#ifdef POLYMORPHISM
-
 	Human* group[] =
 	{
 		new Student("Pinkman", "Jessie", 22, "Chemistry", "WW_220", 95, 98),
@@ -242,18 +257,23 @@ void main()
 	std::ofstream fout("group.txt");
 	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
 	{
-		group[i]->info(cout);
-		fout << *group[i] << endl;
+		group[i]->info();
+		cout << typeid(*group[i]).name() << endl;
+		if (typeid(*group[i]) == typeid(Human))fout << *group[i] << endl;
+		//Manual Downcast:
+		if (typeid(*group[i]) == typeid(Student))fout << *dynamic_cast<Student*>(group[i]) << endl;
+		if (typeid(*group[i]) == typeid(Teacher))fout << *dynamic_cast<Teacher*>(group[i]) << endl;
+		if (typeid(*group[i]) == typeid(Graduate))fout << *dynamic_cast<Graduate*>(group[i]) << endl;
 		cout << delimiter << endl;
 	}
 	fout.close();
-	system("notepad group.txt");
+	system("start notepad group.txt");
 
 	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
 	{
 		delete group[i];
 		cout << delimiter << endl;
 	}
-#endif // POLYMORPHISM
+
 
 }
