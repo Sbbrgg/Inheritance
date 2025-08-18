@@ -3,6 +3,8 @@ using std::cin;
 using std::cout;
 using std::endl;
 
+#define delimiter "\n-------------------------------------\n"
+
 #define HUMAN_TAKE_PARAMETRS const std::string& last_name, const std::string& first_name, int age
 #define HUMAN_GIVE_PARAMETRS last_name, first_name, age
 
@@ -45,13 +47,13 @@ public:
 		set_age(age);
 		cout << "Hconstructor:\t" << this << endl;
 	}
-	~Human()
+	virtual ~Human()
 	{
 		cout << "HDestructor:\t" << this << endl;
 	}
 
 	//					Methods:
-	void info()const
+	virtual void info()const
 	{
 		cout << last_name << " " << first_name << " " << age << endl;
 	}
@@ -89,7 +91,7 @@ public:
 	}
 	void set_group(const std::string& group)
 	{
-		this -> group = group;
+		this->group = group;
 	}
 	void set_rating(double rating)
 	{
@@ -101,7 +103,7 @@ public:
 	}
 
 	//						Constructors:
-	Student(HUMAN_TAKE_PARAMETRS, STUDENT_TAKE_PARAMETRS): Human(HUMAN_GIVE_PARAMETRS)
+	Student(HUMAN_TAKE_PARAMETRS, STUDENT_TAKE_PARAMETRS) : Human(HUMAN_GIVE_PARAMETRS)
 	{
 		set_speciality(speciality);
 		set_group(group);
@@ -115,7 +117,7 @@ public:
 	}
 
 	//						Methods:
-	void info() const
+	void info() const override
 	{
 		Human::info();
 		cout << speciality << " " << group << " " << rating << " " << attendance << endl;
@@ -125,7 +127,7 @@ public:
 #define TEACHER_TAKE_PARAMETRS const std::string& speciality, int experience
 #define TEACHER_GIVE_PARAMETRS speciality, experience
 
-class Teacher :public Human 
+class Teacher :public Human
 {
 	std::string speciality;
 	int experience;
@@ -156,9 +158,9 @@ public:
 	}
 	~Teacher()
 	{
-		cout << "TDestructor" << this << endl;
+		cout << "TDestructor:\t" << this << endl;
 	}
-	void info()const
+	void info()const override
 	{
 		Human::info();
 		cout << speciality << " " << experience << endl;
@@ -196,23 +198,28 @@ public:
 	{
 		set_thesis_topic(thesis_topic);
 		set_thesis_score(thesis_score);
-		cout << "GConstructor" << this << endl;
+		cout << "GConstructor:\t" << this << endl;
 	}
 	~Graduate()
 	{
-		cout << "GDestructor" << this << endl;
+		cout << "GDestructor:\t" << this << endl;
 	}
 
-	void info() const
+	void info() const override
 	{
 		Student::info();
 		cout << "Thesis: " << thesis_topic << " " << thesis_score << endl;
 	}
 };
 
+//#define INHERITANCE
+#define POLYMORPHISM
+
 void main()
 {
 	setlocale(LC_ALL, "");
+
+#ifdef INHERITANCE
 	Human human("Montano", "Antonio", 25);
 	human.info();
 
@@ -222,6 +229,31 @@ void main()
 	Teacher teacher("White", "Whalter", 50, "Chemistry", 25);
 	teacher.info();
 
-	Graduate graduate("Flow", "Sergey", 20, "programm", "GR_2025", 93, 92, "C++", 96);
+	Graduate graduate("Flow", "Klow", 20, "programm", "GR_2025", 93, 92, "C++", 96);
 	graduate.info();
+#endif // INHERITANCE
+
+#ifdef POLYMORPHISM
+	Human* group[] =
+	{
+		new Student("Pinkman", "Jessie", 22, "Chemistry", "WW_220", 95, 98),
+		new Teacher("White", "Walter", 50, "Chemistry", 25),
+		new Graduate("Flow", "Klow", 20, "programm", "GR_2025", 93, 92, "C++", 96),
+		new Student("Vercetty", "Tommy", 30, "Theft", "Vice", 98, 99),
+		new Teacher("Diaz", "Ricardo", 50, "Weapons distribution", 20)
+	};
+
+	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
+	{
+		group[i]->info();
+		cout << delimiter << endl;
+	}
+	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
+	{
+		delete group[i];
+		cout << delimiter << endl;
+	}
+
+#endif // POLYMORPHISM
+
 }
