@@ -12,10 +12,18 @@ using std::endl;
 
 class Human
 {
+	static const int TYPE_WIDTH = 12;
+	static const int NAME_WIDTH = 12;
+	static const int AGE_WIDTH = 5;
+	static int count;	//Объявление статической переменной
 	std::string last_name;
 	std::string first_name;
 	int age;
 public:
+	static int get_count()
+	{
+		return count;
+	}
 	const std::string& get_last_name()const
 	{
 		return last_name;
@@ -47,19 +55,39 @@ public:
 		set_last_name(last_name);
 		set_first_name(first_name);
 		set_age(age);
+		count++;
 		cout << "HConstructor:\t" << this << endl;
 	}
 	virtual ~Human()
 	{
+		count--;
 		cout << "HDestructor:\t" << this << endl;
 	}
 
 	//					Methods:
 	virtual std::ostream& info(std::ostream& os)const	//Base class
 	{
-		return os << last_name << " " << first_name << " " << age;
+		os.width(TYPE_WIDTH);	//метод width(N) задаёт размер поля, в которое будет выведено значение
+						//устанавливается только для первого выведенного элемента.
+		os << std::left;	
+		os << std::string(strchr(typeid(*this).name(), ' ') + 1) + ":";
+
+		//strchr(const char* str, char symbol),
+		//в указанной строке str находит символ symbol и возвращает на него указатель
+		// если символа нет в строке, то вернётся nullptr
+		
+		os.width(NAME_WIDTH);
+		os << last_name;
+		os.width(NAME_WIDTH);
+		os << first_name;
+		os.width(AGE_WIDTH);
+		os << age;
+		return os;
 	}
 };
+
+int Human::count = 0;	//Иинициализация статической переменной (относится к определению класса)
+
 std::ostream& operator<<(std::ostream& os, const Human& obj)
 {
 	return obj.info(os);
@@ -70,6 +98,10 @@ std::ostream& operator<<(std::ostream& os, const Human& obj)
 
 class Student :public Human
 {
+	static const int SPECIALITY_WIDTH = 32;
+	static const int GROUP_WIDTH = 8;
+	static const int RAT_WIDTH = 8;
+
 	std::string speciality;
 	std::string group;
 	double rating;			//успеваемость
@@ -125,7 +157,18 @@ public:
 	//					Methods:
 	std::ostream& info(std::ostream& os)const override	//Derived class
 	{
-		return Human::info(os) << " " << speciality << " " << group << " " << rating << " " << attendance;
+		//return Human::info(os) << " " << speciality << " " << group << " " << rating << " " << attendance;
+		Human::info(os);
+		os.left;
+		os.width(SPECIALITY_WIDTH);
+		os << speciality;
+		os.width(GROUP_WIDTH);
+		os << group;
+		os.width(RAT_WIDTH);
+		os << rating;
+		os.width(RAT_WIDTH);
+		os << attendance;
+		return os;
 	}
 };
 
@@ -134,6 +177,8 @@ public:
 
 class Teacher :public Human
 {
+	static const int SPECIALITY_WIDTH = 32;
+	static const int EXPERIENCE_WIDTH = 5;
 	std::string speciality;
 	int experience;
 public:
@@ -167,7 +212,13 @@ public:
 	}
 	std::ostream& info(std::ostream& os)const override
 	{
-		return Human::info(os) << " " << speciality << " " << experience;
+		//return Human::info(os) << " " << speciality << " " << experience;
+		Human::info(os);
+		os.width(SPECIALITY_WIDTH);
+		os << speciality;
+		os.width(EXPERIENCE_WIDTH);
+		os << experience;
+		return os;
 	}
 };
 
@@ -208,6 +259,7 @@ public:
 
 //#define INHERITANCE
 //#define POLYMORPHISM
+//#define HOMEWORK_FROM_FILE
 #define READ_FROM_FILE
 
 void main()
@@ -256,6 +308,7 @@ void main()
 	}
 #endif // POLYMORPHISM
 
+#ifdef HOMEWORK_FROM_FILE
 	std::ifstream fin("group.csv");
 	const int size = 15;
 	int count_el = 0;
@@ -324,6 +377,33 @@ void main()
 	{
 		delete group[i];
 		cout << "Deleted object #" << i << endl;
+	}
+#endif // DEBUG
+	Human* group[] =
+	{
+		new Student("Pinkman", "Jessie", 22, "Chemistry", "WW_220", 95, 98),
+		new Teacher("White", "Walter", 50, "Chemistry", 25),
+		new Graduate("Schreder", "Hank", 40, "Criminalistic", "OBN", 40, 50, "How to catch Heisenberg"),
+		new Student("Vercetty", "Tommy", 30, "Theft", "Vice", 98, 99),
+		new Teacher("Diaz", "Ricardo", 50, "Weapons distribution", 20)
+	};
+
+	std::ofstream fout("group.txt");
+	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
+	{
+		group[i]->info(cout);
+		fout << *group[i] << endl;
+		cout << delimiter << endl;
+	}
+	cout << "Количество объектов: " << group[0]->get_count() << endl;
+	cout << "Количество объектов: " << Human::get_count() << endl;
+	fout.close();
+	system("notepad group.txt");
+
+	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
+	{
+		delete group[i];
+		cout << delimiter << endl;
 	}
 }
 
