@@ -60,7 +60,6 @@ public:
 		return os << last_name << " " << first_name << " " << age;
 	}
 };
-
 std::ostream& operator<<(std::ostream& os, const Human& obj)
 {
 	return obj.info(os);
@@ -124,7 +123,7 @@ public:
 	}
 
 	//					Methods:
-	std::ostream& info(std::ostream& os)const override//Derived class
+	std::ostream& info(std::ostream& os)const override	//Derived class
 	{
 		return Human::info(os) << " " << speciality << " " << group << " " << rating << " " << attendance;
 	}
@@ -208,7 +207,8 @@ public:
 };
 
 //#define INHERITANCE
-#define POLYMORPHISM //(poly - много, morphis - форма)
+//#define POLYMORPHISM
+
 
 void main()
 {
