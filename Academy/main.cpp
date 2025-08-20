@@ -279,6 +279,51 @@ void Save(Human* group[], const int n, const std::string& filename)
 	cmd += filename;
 	system(cmd.c_str());
 }
+Human** Load(const std::string& filename, int& n)
+{
+	Human** group = nullptr;
+	std::ifstream fin(filename);
+	if (fin.is_open())
+	{
+		//1) Подсчитываем количество объектов в файле
+		n = 0;
+		std::string buffer;
+		while (!fin.eof())
+		{
+			std::getline(fin, buffer);
+			if (buffer.size() < 20)continue;
+			n++;
+		}
+		cout << "Количество объектов: " << n << endl;
+
+		//2) Выделяем память под объкты
+		group = new Human * [n];
+
+		//3) Возвращаемся в начало файла, для того, чтобы прочитать из него сами объекты
+		cout << "Position " << fin.tellg() << endl;	//Метод tellg() возвращает текующую Get-позицию курсора на чтение. (Get- имеется в виду "чтение") "-1" означает eof (end of file)
+		fin.clear();
+		fin.seekg(0);	//Метод seekg(n) переводит Get-курсор (на чтение) в указанную позицию "n"
+		cout << "Position " << fin.tellg() << endl;
+
+
+	}
+	else
+	{
+		std::cerr << "Error: file not found" << endl;
+	}
+	//?) Закрываем файл
+	fin.close();
+
+	return group;
+}
+void Clear(Human* group[], const int n)
+{
+	for (int i = 0; i < n; i++)
+	{
+		delete group[i];
+		cout << delimiter << endl;
+	}
+}
 
 //#define INHERITANCE
 //#define POLYMORPHISM
@@ -315,20 +360,15 @@ void main()
 	};
 
 	std::ofstream fout("group.txt");
-	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
-	{
-		group[i]->info(cout);
-		fout << *group[i] << endl;
-		cout << delimiter << endl;
-	}
-	fout.close();
-	system("notepad group.txt");
 
+	Print(group, sizeof(group) / sizeof(group[0]));
+	Save(group, sizeof(group) / sizeof(group[0]), "group.txt");
 	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
 	{
 		delete group[i];
 		cout << delimiter << endl;
 	}
+
 #endif // POLYMORPHISM
 
 #ifdef HOMEWORK_FROM_FILE
@@ -402,23 +442,11 @@ void main()
 		cout << "Deleted object #" << i << endl;
 	}
 #endif // DEBUG
-	Human* group[] =
-	{
-		new Student("Pinkman", "Jessie", 22, "Chemistry", "WW_220", 95, 98),
-		new Teacher("White", "Walter", 50, "Chemistry", 25),
-		new Graduate("Schreder", "Hank", 40, "Criminalistic", "OBN", 40, 50, "How to catch Heisenberg"),
-		new Student("Vercetty", "Tommy", 30, "Theft", "Vice", 98, 99),
-		new Teacher("Diaz", "Ricardo", 50, "Weapons distribution", 20)
-	};
+	int n;
+	Human** group = Load("group.txt", n);
+	Print(group, n);
 
-	std::ofstream fout("group.txt");
-	
-	Print(group, sizeof(group) / sizeof(group[0]));
-	Save(group, sizeof(group) / sizeof(group[0]), "group.txt");
-	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
-	{
-		delete group[i];
-		cout << delimiter << endl;
-	}
+
+	Clear(group, n);
 }
 
