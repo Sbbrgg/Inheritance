@@ -305,7 +305,11 @@ Human** Load(const std::string& filename, int& n)
 		fin.seekg(0);	//Метод seekg(n) переводит Get-курсор (на чтение) в указанную позицию "n"
 		cout << "Position " << fin.tellg() << endl;
 
-
+		for (int i = 0; i < n; i++)
+		{
+			std::getline(fin, buffer);
+			
+		}
 	}
 	else
 	{
