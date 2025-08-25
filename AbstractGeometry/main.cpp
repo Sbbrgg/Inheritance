@@ -1,4 +1,4 @@
-#include<iostream>
+п»ї#include<iostream>
 using namespace std;
 
 #define delimeter "\n--------------------------------------------------------\n"
@@ -6,7 +6,7 @@ using namespace std;
 
 enum Color
 {
-	//прозрачность, синий, зелёный, красный
+	//РїСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ, СЃРёРЅРёР№, Р·РµР»С‘РЅС‹Р№, РєСЂР°СЃРЅС‹Р№
 	Red = 0x000000FF,
 	Green = 0x0000FF00,
 	Blue = 0x00FF0000,
@@ -21,13 +21,13 @@ class Shape
 	Color color;
 public:
 	Shape(Color color):color(color){}
-	virtual double get_area()const = 0;			//Площадь
-	virtual double get_perimeter()const = 0;	//Периметр
-	virtual void draw()const = 0;				//Рисование
+	virtual double get_area()const = 0;			//РџР»РѕС‰Р°РґСЊ
+	virtual double get_perimeter()const = 0;	//РџРµСЂРёРјРµС‚СЂ
+	virtual void draw()const = 0;				//Р РёСЃРѕРІР°РЅРёРµ
 	virtual void info()const
 	{
-		cout << "Площадь фигуры: " << get_area() << endl;
-		cout << "Периметр фигуры: " << get_perimeter() << endl;
+		cout << "РџР»РѕС‰Р°РґСЊ С„РёРіСѓСЂС‹: " << get_area() << endl;
+		cout << "РџРµСЂРёРјРµС‚СЂ С„РёРіСѓСЂС‹: " << get_perimeter() << endl;
 		draw();
 	}
 };
@@ -70,7 +70,7 @@ public:
 	void info()const override
 	{
 		cout << typeid(*this).name() << endl;
-		cout << "Длина стороны квадрата: " << get_side() << endl;
+		cout << "Р”Р»РёРЅР° СЃС‚РѕСЂРѕРЅС‹ РєРІР°РґСЂР°С‚Р°: " << get_side() << endl;
 		Shape::info();
 	}
 };
@@ -122,8 +122,8 @@ public:
 	}
 	void info()const override
 	{
-		cout << "Длина ширины прямоугольника: " << get_width() << endl;
-		cout << "Длина высоты прямоугольника: " << get_height() << endl;
+		cout << "Р”Р»РёРЅР° С€РёСЂРёРЅС‹ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєР°: " << get_width() << endl;
+		cout << "Р”Р»РёРЅР° РІС‹СЃРѕС‚С‹ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєР°: " << get_height() << endl;
 		Shape::info();
 	}
 };
@@ -189,9 +189,9 @@ public:
 	}
 	void info()const override
 	{
-		cout << "Первая сторона" << get_side_a() << endl;
-		cout << "Вторая сторона" << get_side_b() << endl;
-		cout << "Третья сторона" << get_side_c() << endl;
+		cout << "РџРµСЂРІР°СЏ СЃС‚РѕСЂРѕРЅР°" << get_side_a() << endl;
+		cout << "Р’С‚РѕСЂР°СЏ СЃС‚РѕСЂРѕРЅР°" << get_side_b() << endl;
+		cout << "РўСЂРµС‚СЊСЏ СЃС‚РѕСЂРѕРЅР°" << get_side_c() << endl;
 		Shape::info();
 	}
 };
@@ -226,7 +226,7 @@ public:
 	}
 	void info()const override
 	{
-		cout << "Радиус окружности: " << get_radius() << endl;
+		cout << "Р Р°РґРёСѓСЃ РѕРєСЂСѓР¶РЅРѕСЃС‚Рё: " << get_radius() << endl;
 		Shape::info();
 	}
 };
@@ -236,9 +236,9 @@ void main()
 	cout << hex << Color::SomeColor << endl;
 
 	Square square(5, Color::Red);
-	/*cout << "Длина стороны квадрата: " << square.get_side() << endl;
-	cout << "Площадь квадрата: " << square.get_area() << endl;
-	cout << "Периметр квадрата: " << square.get_perimeter() << endl;
+	/*cout << "Р”Р»РёРЅР° СЃС‚РѕСЂРѕРЅС‹ РєРІР°РґСЂР°С‚Р°: " << square.get_side() << endl;
+	cout << "РџР»РѕС‰Р°РґСЊ РєРІР°РґСЂР°С‚Р°: " << square.get_area() << endl;
+	cout << "РџРµСЂРёРјРµС‚СЂ РєРІР°РґСЂР°С‚Р°: " << square.get_perimeter() << endl;
 	square.draw();*/
 	square.info();
 
