@@ -2,6 +2,8 @@
 #include<Windows.h>
 using namespace std;
 
+#define pi 3.14159
+
 namespace Geometry
 {
 
@@ -86,7 +88,6 @@ namespace Geometry
 		{
 			cout << "Площадь фигуры: " << get_area() << endl;
 			cout << "Периметр фигуры: " << get_perimeter() << endl;
-			draw();
 		}
 	};
 	/*class Square :public Shape
@@ -143,11 +144,17 @@ namespace Geometry
 		}
 		void set_width(double width)
 		{
-			this->width = width;
+			this->width =
+				width < MIN_SIZE ? MIN_SIZE :
+				width > MAX_SIZE ? MAX_SIZE :
+				width;
 		}
 		void set_height(double height)
 		{
-			this->height = height;
+			this->height =
+				height < MIN_SIZE ? MIN_SIZE :
+				height > MAX_SIZE ? MAX_SIZE :
+				height;
 		}
 		double get_width()const
 		{
@@ -200,8 +207,90 @@ namespace Geometry
 	class Square :public Rectangle
 	{
 	public:
-		Square(int side, SHAPE_TAKE_PARAMETERS) :Rectangle(side ,side, SHAPE_GIVE_PARAMETERS) {}
+		Square(int side, SHAPE_TAKE_PARAMETERS) :Rectangle(side, side, SHAPE_GIVE_PARAMETERS) {}
+		void info()const override
+		{
+			cout << typeid(*this).name() << endl;
+			cout << "Сторона квадрата: " << get_width() << endl;
+			Shape::info();
+		}
 	};
+	class Ellipse :public Shape
+	{
+	protected:
+		double radius_x;
+		double radius_y;
+	public:
+		Ellipse(double radius_x, double radius_y, SHAPE_TAKE_PARAMETERS) :Shape(SHAPE_GIVE_PARAMETERS)
+		{
+			set_radius_x(radius_x);
+			set_radius_y(radius_y);
+		}
+		void set_radius_x(double x)
+		{
+			this->radius_x =
+				x < MIN_SIZE ? MIN_SIZE :
+				x > MAX_SIZE ? MAX_SIZE :
+				x;
+		}
+		void set_radius_y(double y)
+		{
+			this->radius_y =
+				y < MIN_SIZE ? MIN_SIZE :
+				y > MAX_SIZE ? MAX_SIZE :
+				y;
+		}
+		double get_radius_x()const { return radius_x; }
+		double get_radius_y()const { return radius_y; }
+
+		double get_area()const override
+		{
+			return pi * radius_x * radius_y;
+		}
+		double get_perimeter()const override
+		{
+			return (pi * (3 * (radius_x + radius_y) - sqrt((3 * radius_x + radius_y) * (radius_x + 3 * radius_y)))) / 2;
+		}
+		void draw()const override
+		{
+			HWND hwnd = GetConsoleWindow();
+			HDC hdc = GetDC(hwnd);
+
+			HPEN hPen = CreatePen(PS_SOLID, line_width, color);
+			HBRUSH hBrush = CreateSolidBrush(color);
+
+			SelectObject(hdc, hPen);
+			SelectObject(hdc, hBrush);
+
+			::Ellipse(hdc,
+				start_x - radius_x, start_y - radius_y,
+				start_x + radius_x, start_y + radius_y);
+
+			DeleteObject(hPen);
+			DeleteObject(hBrush);
+
+			ReleaseDC(hwnd, hdc);
+		}
+		void info()const override
+		{
+			cout << typeid(*this).name() << endl;
+			cout << "Радиусы: " << radius_x << "x" << radius_y << endl;
+			Shape::info();
+		}
+	};
+	class Circle :public Ellipse
+	{
+	public:
+		Circle(double radius, SHAPE_TAKE_PARAMETERS) 
+			:Ellipse(radius, radius, SHAPE_GIVE_PARAMETERS){}
+		void info()const override
+		{
+			cout << typeid(*this).name() << endl;
+			cout << "Радиус: " << get_radius_x() << endl;
+			Shape::info();
+		}
+	};
+	
 }
 
 void main()
@@ -221,9 +310,17 @@ void main()
 	Geometry::Rectangle rect(150, 100, 550, 100, 2, Geometry::Color::Orange);
 	rect.info();
 	cout << delimetr << endl;
+
+
+	Geometry::Ellipse ell(120, 80, 400, 250, 2, Geometry::Color::Green);
+	ell.info();
+	cout << delimetr << endl;
+
+	Geometry::Circle circ(90, 700, 300, 3, Geometry::Color::Yellow);
+	circ.info();
 	while (true)
 	{
-		square.draw();
-		rect.draw();
+		ell.draw();
+		circ.draw();
 	}
 }
