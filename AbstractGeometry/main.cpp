@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include<iostream>
 #include<Windows.h>
 using namespace std;
@@ -37,7 +38,7 @@ namespace Geometry
 		static const int MIN_LINE_WIDTH = 1;
 		static const int MAX_LINE_WIDTH = 16;
 		static const int MIN_SIZE = 32;
-		static const int MAX_SIZE = 768;
+		static const int MAX_SIZE = 512;
 
 		Shape(SHAPE_TAKE_PARAMETERS) :color(color)
 		{
@@ -45,6 +46,7 @@ namespace Geometry
 			set_start_y(start_y);
 			set_line_width(line_width);
 		}
+
 		void set_start_x(int start_x)
 		{
 			this->start_x =
@@ -79,14 +81,22 @@ namespace Geometry
 			return line_width;
 		}
 
+		int filter_size(int size)const
+		{
+			return
+				size < MIN_SIZE ? MIN_SIZE :
+				size > MAX_SIZE ? MAX_SIZE :
+				size;
+		}
+
 		virtual double get_area()const = 0;			//Площадь
 		virtual double get_perimeter()const = 0;	//Периметр
 		virtual void draw()const = 0;				//Рисование
+
 		virtual void info()const
 		{
 			cout << "Площадь фигуры: " << get_area() << endl;
 			cout << "Периметр фигуры: " << get_perimeter() << endl;
-			draw();
 		}
 	};
 	/*class Square :public Shape
@@ -141,13 +151,14 @@ namespace Geometry
 			set_width(width);
 			set_height(height);
 		}
+
 		void set_width(double width)
 		{
-			this->width = width;
+			this->width = filter_size(width);
 		}
 		void set_height(double height)
 		{
-			this->height = height;
+			this->height = filter_size(height);
 		}
 		double get_width()const
 		{
@@ -165,6 +176,7 @@ namespace Geometry
 		{
 			return (width + height) * 2;
 		}
+
 		void draw()const override
 		{
 			//1) Получаем окно консоли:
@@ -200,7 +212,124 @@ namespace Geometry
 	class Square :public Rectangle
 	{
 	public:
-		Square(int side, SHAPE_TAKE_PARAMETERS) :Rectangle(side ,side, SHAPE_GIVE_PARAMETERS) {}
+		Square(int side, SHAPE_TAKE_PARAMETERS) :Rectangle(side, side, SHAPE_GIVE_PARAMETERS) {}
+	};
+
+	class Circle :public Shape
+	{
+		double radius;
+	public:
+		Circle(double radius, SHAPE_TAKE_PARAMETERS) :Shape(SHAPE_GIVE_PARAMETERS)
+		{
+			set_radius(radius);
+		}
+
+		void set_radius(double radius)
+		{
+			this->radius = filter_size(radius);
+		}
+		double get_radius()const
+		{
+			return radius;
+		}
+		double get_diametr()const
+		{
+			return 2 * radius;
+		}
+		double get_area()const override
+		{
+			return M_PI * radius * radius;
+		}
+		double get_perimeter()const override
+		{
+			return M_PI * get_diametr();
+		}
+
+		void draw()const override
+		{
+			HWND hwnd = GetConsoleWindow();
+			HDC hdc = GetDC(hwnd);
+			HPEN hPen = CreatePen(PS_SOLID, line_width, color);
+			HBRUSH hBrush = CreateSolidBrush(color);
+
+			SelectObject(hdc, hPen);
+			SelectObject(hdc, hBrush);
+
+			::Ellipse(hdc, start_x, start_y, start_x + get_diametr(), start_y + get_diametr());
+
+			DeleteObject(hBrush);
+			DeleteObject(hPen);
+			ReleaseDC(hwnd, hdc);
+
+		}
+		void info()const override
+		{
+
+		}
+	};
+	class Triangle :public Shape
+	{
+	public:
+		Triangle(SHAPE_TAKE_PARAMETERS) :Shape(SHAPE_GIVE_PARAMETERS) {}
+		virtual double get_height()const = 0;
+	};
+	class EquilateralTriangle :public Triangle
+	{
+		// Равносторонний
+		double side;
+	public:
+		EquilateralTriangle(double side, SHAPE_TAKE_PARAMETERS) :Triangle(SHAPE_GIVE_PARAMETERS)
+		{
+			set_side(side);
+		}
+		void set_side(double side)
+		{
+			this->side = filter_size(side);
+		}
+		double get_side()const
+		{
+			return side;
+		}
+		double get_height()const
+		{
+			//return sqrt(3) * get_side() / 2;
+			return sqrt(pow(side, 2) - pow(side / 2, 2));
+		}
+		double get_area()const
+		{
+			return side * get_height() / 2;
+		}
+		double get_perimeter()const
+		{
+			return 3 * side;
+		}
+
+		void draw()const override
+		{
+			HWND hwnd = GetConsoleWindow();
+			HDC hdc = GetDC(hwnd);
+			HPEN hPen = CreatePen(PS_SOLID, line_width, color);
+			HBRUSH hBrush = CreateSolidBrush(color);
+
+			SelectObject(hdc, hPen);
+			SelectObject(hdc, hBrush);
+
+			const POINT vertices[] =
+			{
+				{ start_x, start_y + get_height() },
+				{ start_x + side, start_y + get_height() },
+				{ start_x + side / 2, start_y }
+			};// вершины
+			::Polygon(hdc, vertices, 3);
+
+			DeleteObject(hBrush);
+			DeleteObject(hPen);
+			ReleaseDC(hwnd, hdc);
+		}
+		void info()const override
+		{
+
+		}
 	};
 }
 
@@ -218,12 +347,22 @@ void main()
 	square.info();
 	cout << delimetr << endl;
 
-	Geometry::Rectangle rect(150, 100, 550, 100, 2, Geometry::Color::Orange);
+	Geometry::Rectangle rect(15000, 10000, 150, 100, 2, Geometry::Color::Orange);
 	rect.info();
 	cout << delimetr << endl;
+
+	Geometry::Circle circle(50, 800, 200, 1, Geometry::Color::Yellow);
+	circle.info();
+	cout << delimetr << endl;
+
+	Geometry::EquilateralTriangle e_triangle(50, 550, 350, 32, Geometry::Color::Green);
+	e_triangle.info();
+
 	while (true)
 	{
-		square.draw();
-		rect.draw();
+		//square.draw();
+		//rect.draw();
+		//circle.draw();
+		e_triangle.draw();
 	}
 }
