@@ -30,6 +30,27 @@ namespace Geometry
 		int start_x;
 		int start_y;
 		int line_width;
+
+		mutable HWND hwnd;
+		mutable HDC hdc;
+		mutable HPEN hPen;
+		mutable HBRUSH hBrush;
+		void draw_begin()const
+		{
+			this->hwnd = GetConsoleWindow();
+			this->hdc = GetDC(hwnd);
+			this->hPen = CreatePen(PS_SOLID, line_width, color);
+			this->hBrush = CreateSolidBrush(color);
+			SelectObject(this->hdc, this->hPen);
+			SelectObject(this->hdc, this->hBrush);
+		}
+		void draw_end()const
+		{
+			DeleteObject(this->hBrush);
+			DeleteObject(this->hPen);
+			ReleaseDC(this->hwnd, this->hdc);
+		}
+		virtual void draw_figure(HDC hdc) const = 0;
 	public:
 		static const int MIN_START_X = 100;
 		static const int MIN_START_Y = 100;
@@ -91,7 +112,13 @@ namespace Geometry
 
 		virtual double get_area()const = 0;			//Площадь
 		virtual double get_perimeter()const = 0;	//Периметр
-		virtual void draw()const = 0;				//Рисование
+		//virtual void draw()const = 0;				//Рисование
+		void draw()const
+		{
+			draw_begin();
+			draw_figure(hdc);
+			draw_end();
+		}
 
 		virtual void info()const
 		{
@@ -177,31 +204,35 @@ namespace Geometry
 			return (width + height) * 2;
 		}
 
-		void draw()const override
+		void draw_figure(HDC hdc) const override
 		{
-			//1) Получаем окно консоли:
-			HWND hwnd = GetConsoleWindow();
-
-			//2) Получаем контекст устройства (DC - Device Context) для окна консоли:
-			HDC hdc = GetDC(hwnd);	// DC - это то, на чём мы будем рисовать
-
-			//3) Создадим инструменты, которыми мы будем рисовать
-			HPEN hPen = CreatePen(PS_SOLID, 5, color);	// Карандаш (Pen) рисует контур фигуры
-			HBRUSH hBrush = CreateSolidBrush(color);	// Кисть (Brush) рисует зливку фигуры
-
-			//4) Выберем созданнеы инструменты
-			SelectObject(hdc, hPen);
-			SelectObject(hdc, hBrush);
-
-			//5) После того, как все необходимые инструменты созданы и выбраны, можно рисовать
 			::Rectangle(hdc, start_x, start_y, start_x + width, start_y + height);
-
-			//6) hdc, hPen, hBrush занимают ресурсы, а ресурсы нужно освобождать:
-			DeleteObject(hPen);
-			DeleteObject(hBrush);
-
-			ReleaseDC(hwnd, hdc);
 		}
+		//void draw()const override
+		//{
+		//	//1) Получаем окно консоли:
+		//	HWND hwnd = GetConsoleWindow();
+
+		//	//2) Получаем контекст устройства (DC - Device Context) для окна консоли:
+		//	HDC hdc = GetDC(hwnd);	// DC - это то, на чём мы будем рисовать
+
+		//	//3) Создадим инструменты, которыми мы будем рисовать
+		//	HPEN hPen = CreatePen(PS_SOLID, 5, color);	// Карандаш (Pen) рисует контур фигуры
+		//	HBRUSH hBrush = CreateSolidBrush(color);	// Кисть (Brush) рисует зливку фигуры
+
+		//	//4) Выберем созданнеы инструменты
+		//	SelectObject(hdc, hPen);
+		//	SelectObject(hdc, hBrush);
+
+		//	//5) После того, как все необходимые инструменты созданы и выбраны, можно рисовать
+		//	::Rectangle(hdc, start_x, start_y, start_x + width, start_y + height);
+
+		//	//6) hdc, hPen, hBrush занимают ресурсы, а ресурсы нужно освобождать:
+		//	DeleteObject(hPen);
+		//	DeleteObject(hBrush);
+
+		//	ReleaseDC(hwnd, hdc);
+		//}
 		void info()const override
 		{
 			cout << typeid(*this).name() << endl;
@@ -245,7 +276,11 @@ namespace Geometry
 			return M_PI * get_diametr();
 		}
 
-		void draw()const override
+		void draw_figure(HDC hdc)const override
+		{
+			::Ellipse(hdc, start_x, start_y, start_x + get_diametr(), start_y + get_diametr());
+		}
+		/*void draw()const override
 		{
 			HWND hwnd = GetConsoleWindow();
 			HDC hdc = GetDC(hwnd);
@@ -261,7 +296,7 @@ namespace Geometry
 			DeleteObject(hPen);
 			ReleaseDC(hwnd, hdc);
 
-		}
+		}*/
 		void info()const override
 		{
 
@@ -309,16 +344,8 @@ namespace Geometry
 			return 3 * side;
 		}
 
-		void draw()const override
+		void draw_figure(HDC hdc)const override
 		{
-			HWND hwnd = GetConsoleWindow();
-			HDC hdc = GetDC(hwnd);
-			HPEN hPen = CreatePen(PS_SOLID, line_width, color);
-			HBRUSH hBrush = CreateSolidBrush(color);
-
-			SelectObject(hdc, hPen);
-			SelectObject(hdc, hBrush);
-
 			const POINT vertices[] =
 			{
 				{ start_x, start_y + get_height() },
@@ -326,11 +353,29 @@ namespace Geometry
 				{ start_x + side / 2, start_y }
 			};// вершины
 			::Polygon(hdc, vertices, 3);
-
-			DeleteObject(hBrush);
-			DeleteObject(hPen);
-			ReleaseDC(hwnd, hdc);
 		}
+		//void draw()const override
+		//{
+		//	HWND hwnd = GetConsoleWindow();
+		//	HDC hdc = GetDC(hwnd);
+		//	HPEN hPen = CreatePen(PS_SOLID, line_width, color);
+		//	HBRUSH hBrush = CreateSolidBrush(color);
+
+		//	SelectObject(hdc, hPen);
+		//	SelectObject(hdc, hBrush);
+
+		//	const POINT vertices[] =
+		//	{
+		//		{ start_x, start_y + get_height() },
+		//		{ start_x + side, start_y + get_height() },
+		//		{ start_x + side / 2, start_y }
+		//	};// вершины
+		//	::Polygon(hdc, vertices, 3);
+
+		//	DeleteObject(hBrush);
+		//	DeleteObject(hPen);
+		//	ReleaseDC(hwnd, hdc);
+		//}
 		void info()const override
 		{
 			cout << typeid(*this).name() << endl;
@@ -339,7 +384,7 @@ namespace Geometry
 			Shape::info();
 		}
 	};
-	
+
 	class IsoscelesTriangle :public Triangle
 	{
 		// Равнобедренный
@@ -362,7 +407,7 @@ namespace Geometry
 		double get_base()const { return base; }
 		double get_side()const { return side; }
 
-		double get_height()const override{ return sqrt(pow(side, 2) - pow(base / 2, 2)); }
+		double get_height()const override { return sqrt(pow(side, 2) - pow(base / 2, 2)); }
 		double get_area()const override
 		{
 			return base * get_height() / 2;
@@ -372,7 +417,17 @@ namespace Geometry
 			return base + side * 2;
 		}
 
-		void draw()const override
+		void draw_figure(HDC hdc)const override
+		{
+			const POINT vertices[] =
+			{
+				{start_x, start_y + get_height()},
+				{start_x + base, start_y + get_height()},
+				{start_x + base / 2, start_y},
+			};
+			::Polygon(hdc, vertices, 3);
+		}
+		/*void draw()const override
 		{
 			HWND hwnd = GetConsoleWindow();
 			HDC hdc = GetDC(hwnd);
@@ -393,7 +448,7 @@ namespace Geometry
 			DeleteObject(hBrush);
 			DeleteObject(hPen);
 			ReleaseDC(hwnd, hdc);
-		}
+		}*/
 		void info()const override
 		{
 			cout << typeid(*this).name() << endl;
@@ -418,7 +473,7 @@ namespace Geometry
 		void set_height(double height) { this->height = height; }
 
 		double get_base()const { return base; }
-		double get_height()const override{ return height; }
+		double get_height()const override { return height; }
 
 		double get_area()const override
 		{
@@ -429,7 +484,17 @@ namespace Geometry
 			return base + height + sqrt(pow(base, 2) + pow(height, 2));
 		}
 
-		void draw() const override
+		void draw_figure(HDC hdc)const override
+		{
+			const POINT verices[] =
+			{
+				{ start_x, start_y + height },
+				{ start_x + base, start_y + height },
+				{ start_x, start_y }
+			};
+			::Polygon(hdc, verices, 3);
+		}
+		/*void draw() const override
 		{
 			HWND hwnd = GetConsoleWindow();
 			HDC hdc = GetDC(hwnd);
@@ -450,7 +515,7 @@ namespace Geometry
 			DeleteObject(hBrush);
 			DeleteObject(hPen);
 			ReleaseDC(hwnd, hdc);
-		}
+		}*/
 		void info()const override
 		{
 			cout << typeid(*this).name() << endl;
@@ -490,7 +555,7 @@ namespace Geometry
 
 		double get_height() const override
 		{
-			return (2*get_area()) / a;
+			return (2 * get_area()) / a;
 		}
 		double get_area()const override
 		{
@@ -501,7 +566,18 @@ namespace Geometry
 		{
 			return a + b + c;
 		}
-		void draw()const override
+
+		void draw_figure(HDC hdc)const override
+		{
+			const POINT vertices[] =
+			{
+				{start_x, start_y + get_height()},
+				{start_x + a, start_y + get_height()},
+				{start_x + a / 2, start_y}
+			};
+			::Polygon(hdc, vertices, 3);
+		}
+		/*void draw()const override
 		{
 			HWND hwnd = GetConsoleWindow();
 			HDC hdc = GetDC(hwnd);
@@ -522,7 +598,7 @@ namespace Geometry
 			DeleteObject(hPen);
 			DeleteObject(hBrush);
 			ReleaseDC(hwnd, hdc);
-		}
+		}*/
 		void info() const override
 		{
 			cout << typeid(*this).name() << endl;
@@ -567,14 +643,37 @@ void main()
 	cout << delimetr << endl;
 	Geometry::DefaultTriangle def(100, 120, 150, 300, 500, 2, Geometry::Color::Red);
 	def.info();
+
+	Sleep(1000);
+	system("cls");
 	while (true)
 	{
-		//square.draw();
-		//rect.draw();
-		//circle.draw();
+		rect.draw();
+		Sleep(1000);
+		system("cls");
+
+		square.draw();
+		Sleep(1000);
+		system("cls");
+
+		circle.draw();
+		Sleep(1000);
+		system("cls");
+
 		e_triangle.draw();
+		Sleep(1000);
+		system("cls");
+
 		iso.draw();
+		Sleep(1000);
+		system("cls");
+
 		ra.draw();
+		Sleep(1000);
+		system("cls");
+
 		def.draw();
+		Sleep(1000);
+		system("cls");
 	}
 }
