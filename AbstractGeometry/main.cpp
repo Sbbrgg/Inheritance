@@ -272,6 +272,11 @@ namespace Geometry
 	public:
 		Triangle(SHAPE_TAKE_PARAMETERS) :Shape(SHAPE_GIVE_PARAMETERS) {}
 		virtual double get_height()const = 0;
+		void info() const override
+		{
+			cout << typeid(*this).name() << endl;
+			Shape::info();
+		}
 	};
 	class EquilateralTriangle :public Triangle
 	{
@@ -328,7 +333,202 @@ namespace Geometry
 		}
 		void info()const override
 		{
+			cout << typeid(*this).name() << endl;
+			cout << "Сторона: " << side << endl;
+			cout << "Высота: " << get_height() << endl;
+			Shape::info();
+		}
+	};
+	
+	class IsoscelesTriangle :public Triangle
+	{
+		// Равнобедренный
+		double side;
+		double base;
+	public:
+		IsoscelesTriangle(double base, double side, SHAPE_TAKE_PARAMETERS) :Triangle(SHAPE_GIVE_PARAMETERS)
+		{
+			set_base(base);
+			set_side(side);
+		}
+		void set_base(double base)
+		{
+			this->base = filter_size(base);
+		}
+		void set_side(double side)
+		{
+			this->side = filter_size(side);
+		}
+		double get_base()const { return base; }
+		double get_side()const { return side; }
 
+		double get_height()const override{ return sqrt(pow(side, 2) - pow(base / 2, 2)); }
+		double get_area()const override
+		{
+			return base * get_height() / 2;
+		}
+		double get_perimeter()const override
+		{
+			return base + side * 2;
+		}
+
+		void draw()const override
+		{
+			HWND hwnd = GetConsoleWindow();
+			HDC hdc = GetDC(hwnd);
+			HPEN hPen = CreatePen(PS_SOLID, line_width, color);
+			HBRUSH hBrush = CreateSolidBrush(color);
+
+			SelectObject(hdc, hPen);
+			SelectObject(hdc, hBrush);
+
+			const POINT vertices[] =
+			{
+				{start_x, start_y + get_height()},
+				{start_x + base, start_y + get_height()},
+				{start_x + base / 2, start_y},
+			};
+			::Polygon(hdc, vertices, 3);
+
+			DeleteObject(hBrush);
+			DeleteObject(hPen);
+			ReleaseDC(hwnd, hdc);
+		}
+		void info()const override
+		{
+			cout << typeid(*this).name() << endl;
+			cout << "Основание: " << base << endl;
+			cout << "Боковая сторона: " << side << endl;
+			cout << "Высота: " << get_height() << endl;
+			Shape::info();
+		}
+	};
+	class RightAngledTriangle :public Triangle
+	{
+		// Прямоугольный
+		double base;
+		double height;
+	public:
+		RightAngledTriangle(double base, double height, SHAPE_TAKE_PARAMETERS) :Triangle(SHAPE_GIVE_PARAMETERS)
+		{
+			set_base(base);
+			set_height(height);
+		}
+		void set_base(double base) { this->base = base; }
+		void set_height(double height) { this->height = height; }
+
+		double get_base()const { return base; }
+		double get_height()const override{ return height; }
+
+		double get_area()const override
+		{
+			return base * height / 2;
+		}
+		double get_perimeter()const override
+		{
+			return base + height + sqrt(pow(base, 2) + pow(height, 2));
+		}
+
+		void draw() const override
+		{
+			HWND hwnd = GetConsoleWindow();
+			HDC hdc = GetDC(hwnd);
+			HPEN hPen = CreatePen(PS_SOLID, line_width, color);
+			HBRUSH hBrush = CreateSolidBrush(color);
+
+			SelectObject(hdc, hPen);
+			SelectObject(hdc, hBrush);
+
+			const POINT verices[] =
+			{
+				{ start_x, start_y + height },
+				{ start_x + base, start_y + height },
+				{ start_x, start_y }
+			};
+			::Polygon(hdc, verices, 3);
+
+			DeleteObject(hBrush);
+			DeleteObject(hPen);
+			ReleaseDC(hwnd, hdc);
+		}
+		void info()const override
+		{
+			cout << typeid(*this).name() << endl;
+			cout << "Катет a: " << base << endl;
+			cout << "Катет b: " << height << endl;
+			cout << "Гипотенуза: " << sqrt(pow(base, 2) + pow(height, 2)) << endl;
+			Shape::info();
+		}
+	};
+	class DefaultTriangle :public Triangle
+	{
+		double a;
+		double b;
+		double c;
+	public:
+		DefaultTriangle(double a, double b, double c, SHAPE_TAKE_PARAMETERS)
+			:Triangle(SHAPE_GIVE_PARAMETERS)
+		{
+			set_sides(a, b, c);
+		}
+		void set_sides(double a, double b, double c)
+		{
+			if ((a + b) > c && (a + c) > b && (b + c) > a)
+			{
+				this->a = filter_size(a);
+				this->b = filter_size(b);
+				this->c = filter_size(c);
+			}
+			else
+			{
+				this->a = this->b = this->c = 1;
+			}
+		}
+		double get_a()const { return a; }
+		double get_b()const { return b; }
+		double get_c()const { return c; }
+
+		double get_height() const override
+		{
+			return (2*get_area()) / a;
+		}
+		double get_area()const override
+		{
+			double p = get_perimeter() / 2;
+			return sqrt(p * (p - a) * (p - b) * (p - c));
+		}
+		double get_perimeter()const override
+		{
+			return a + b + c;
+		}
+		void draw()const override
+		{
+			HWND hwnd = GetConsoleWindow();
+			HDC hdc = GetDC(hwnd);
+			HPEN hPen = CreatePen(PS_SOLID, line_width, color);
+			HBRUSH hBrush = CreateSolidBrush(color);
+
+			SelectObject(hdc, hPen);
+			SelectObject(hdc, hBrush);
+
+			const POINT vertices[] =
+			{
+				{start_x, start_y + get_height()},
+				{start_x + a, start_y + get_height()},
+				{start_x + a / 2, start_y}
+			};
+			::Polygon(hdc, vertices, 3);
+
+			DeleteObject(hPen);
+			DeleteObject(hBrush);
+			ReleaseDC(hwnd, hdc);
+		}
+		void info() const override
+		{
+			cout << typeid(*this).name() << endl;
+			cout << "Стороны: " << a << ", " << b << ", " << c << endl;
+			cout << "Высота к стороне a: " << get_height() << endl;
+			Shape::info();
 		}
 	};
 }
@@ -357,12 +557,24 @@ void main()
 
 	Geometry::EquilateralTriangle e_triangle(50, 550, 350, 32, Geometry::Color::Green);
 	e_triangle.info();
+	cout << delimetr << endl;
 
+	Geometry::IsoscelesTriangle iso(150, 120, 500, 300, 2, Geometry::Color::Blue);
+	iso.info();
+	cout << delimetr << endl;
+	Geometry::RightAngledTriangle ra(120, 80, 700, 400, 2, Geometry::Color::Orange);
+	ra.info();
+	cout << delimetr << endl;
+	Geometry::DefaultTriangle def(100, 120, 150, 300, 500, 2, Geometry::Color::Red);
+	def.info();
 	while (true)
 	{
 		//square.draw();
 		//rect.draw();
 		//circle.draw();
 		e_triangle.draw();
+		iso.draw();
+		ra.draw();
+		def.draw();
 	}
 }
