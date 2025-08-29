@@ -1,28 +1,70 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="Geometry::Shape" Collapsed="true">
-    <Position X="2.5" Y="1" Width="1.5" />
+    <Position X="6" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAUAAAADAAAgQIAABIAAAEFYABAAAyAQAAAAiAAIAA=</HashCode>
+      <HashCode>AAAUAAAADAAAgQIAABMAAAEVYABCEAyAQAAAAjgAJAA=</HashCode>
       <FileName>main.cpp</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Geometry::Rectangle" Collapsed="true">
-    <Position X="2.5" Y="2.25" Width="1.5" />
+    <Position X="11.75" Y="1.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAEAABAAAAAQQAQgIAAAAAAAAgAAAAQAAAAgAAIAA=</HashCode>
+      <HashCode>AAAAEAABAAAAAQQAQgAAAAAAAAAiAAAAQAAAAgAAIAA=</HashCode>
       <FileName>main.cpp</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Geometry::Square" Collapsed="true">
-    <Position X="2.5" Y="3.75" Width="1.5" />
+    <Position X="11.75" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
       <FileName>main.cpp</FileName>
     </TypeIdentifier>
   </Class>
+  <Class Name="Geometry::Circle" Collapsed="true">
+    <Position X="0.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAACAAAAQAAAAAACAAAAAgCAAAAQAAAAgAAAgA=</HashCode>
+      <FileName>main.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Geometry::Triangle" Collapsed="true">
+    <Position X="6" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAQAAAAAAAIAA=</HashCode>
+      <FileName>main.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Geometry::EquilateralTriangle" Collapsed="true">
+    <Position X="7.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAACIAAAAAAAQAAAIAAAAAAAAACAAAAQAAAAgAAIAA=</HashCode>
+      <FileName>main.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Geometry::IsoscelesTriangle" Collapsed="true">
+    <Position X="9.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABACIiAAAAAAQAAAIAAAAAAgAACAAAAQAAAAgAAIAA=</HashCode>
+      <FileName>main.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Geometry::RightAngledTriangle" Collapsed="true">
+    <Position X="2.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAiAAAAAAQQAAgBAAAAAAAACAAAAQAAAAgAAIAA=</HashCode>
+      <FileName>main.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Geometry::DefaultTriangle" Collapsed="true">
+    <Position X="5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAASAAAAACAARAAAAAAAAAAAAACBACgQQAAAgAAIAA=</HashCode>
+      <FileName>main.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
   <Enum Name="Geometry::Color" Collapsed="true">
-    <Position X="5" Y="1" Width="1.5" />
+    <Position X="14.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAIAhAAAAAAAAAABAAAAAAAAAAAADAAAAA=</HashCode>
       <FileName>main.cpp</FileName>
