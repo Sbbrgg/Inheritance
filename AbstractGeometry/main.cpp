@@ -26,6 +26,9 @@ namespace Geometry
 	class Shape
 	{
 	protected:
+		static int counter;
+		static HWND hwnd;
+		static HDC hdc;
 		Color color;
 		int start_x;
 		int start_y;
@@ -99,6 +102,9 @@ namespace Geometry
 			cout << "Периметр фигуры: " << get_perimeter() << endl;
 		}
 	};
+	HWND Shape::hwnd = GetConsoleWindow();
+	int Shape::counter = 0;
+	HDC Shape::hdc = NULL;
 	/*class Square :public Shape
 	{
 		double side;
