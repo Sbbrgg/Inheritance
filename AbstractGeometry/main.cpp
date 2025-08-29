@@ -91,7 +91,33 @@ namespace Geometry
 
 		virtual double get_area()const = 0;			//Площадь
 		virtual double get_perimeter()const = 0;	//Периметр
-		virtual void draw()const;				//Рисование
+		virtual void draw()const = 0;				//Рисование
+		virtual void draw(int width, int height, BOOL (__stdcall *DrawFunction)(HDC, int, int, int, int))const
+		{
+			//__stdcall - Calling onvention (конвенция вызова функции)
+			//1) Получаем окно консоли:
+			HWND hwnd = GetConsoleWindow();
+
+			//2) Получаем контекст устройства (DC - Device Context) для окна консоли:
+			HDC hdc = GetDC(hwnd);	// DC - это то, на чём мы будем рисовать
+
+			//3) Создадим инструменты, которыми мы будем рисовать
+			HPEN hPen = CreatePen(PS_SOLID, 5, color);	// Карандаш (Pen) рисует контур фигуры
+			HBRUSH hBrush = CreateSolidBrush(color);	// Кисть (Brush) рисует зливку фигуры
+
+			//4) Выберем созданнеы инструменты
+			SelectObject(hdc, hPen);
+			SelectObject(hdc, hBrush);
+
+			//5) После того, как все необходимые инструменты созданы и выбраны, можно рисовать
+			(*DrawFunction)(hdc, start_x, start_y, start_x + width, start_y + height);
+
+			//6) hdc, hPen, hBrush занимают ресурсы, а ресурсы нужно освобождать:
+			DeleteObject(hPen);
+			DeleteObject(hBrush);
+
+			ReleaseDC(hwnd, hdc);
+		}
 
 		virtual void info()const
 		{
@@ -177,30 +203,9 @@ namespace Geometry
 			return (width + height) * 2;
 		}
 
-		void draw()const override
+		virtual void draw()const 
 		{
-			//1) Получаем окно консоли:
-			HWND hwnd = GetConsoleWindow();
-
-			//2) Получаем контекст устройства (DC - Device Context) для окна консоли:
-			HDC hdc = GetDC(hwnd);	// DC - это то, на чём мы будем рисовать
-
-			//3) Создадим инструменты, которыми мы будем рисовать
-			HPEN hPen = CreatePen(PS_SOLID, 5, color);	// Карандаш (Pen) рисует контур фигуры
-			HBRUSH hBrush = CreateSolidBrush(color);	// Кисть (Brush) рисует зливку фигуры
-
-			//4) Выберем созданнеы инструменты
-			SelectObject(hdc, hPen);
-			SelectObject(hdc, hBrush);
-
-			//5) После того, как все необходимые инструменты созданы и выбраны, можно рисовать
-			::DrawFunction(hdc, start_x, start_y, start_x + width, start_y + height);
-
-			//6) hdc, hPen, hBrush занимают ресурсы, а ресурсы нужно освобождать:
-			DeleteObject(hPen);
-			DeleteObject(hBrush);
-
-			ReleaseDC(hwnd, hdc);
+			Geometry::Shape::draw(width, height, ::Rectangle);
 		}
 		void info()const override
 		{
@@ -247,20 +252,7 @@ namespace Geometry
 
 		void draw()const override
 		{
-			HWND hwnd = GetConsoleWindow();
-			HDC hdc = GetDC(hwnd);
-			HPEN hPen = CreatePen(PS_SOLID, line_width, color);
-			HBRUSH hBrush = CreateSolidBrush(color);
-
-			SelectObject(hdc, hPen);
-			SelectObject(hdc, hBrush);
-
-			::Ellipse(hdc, start_x, start_y, start_x + get_diametr(), start_y + get_diametr());
-
-			DeleteObject(hBrush);
-			DeleteObject(hPen);
-			ReleaseDC(hwnd, hdc);
-
+			Shape::draw(get_diametr(), get_diametr(), ::Ellipse);
 		}
 		void info()const override
 		{
@@ -360,9 +352,9 @@ void main()
 
 	while (true)
 	{
-		//square.draw();
-		//rect.draw();
-		//circle.draw();
+		square.draw();
+		rect.draw();
+		circle.draw();
 		e_triangle.draw();
 	}
 }
